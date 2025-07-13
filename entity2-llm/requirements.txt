@@ -31,7 +31,7 @@ redis==5.0.1
 sqlalchemy[asyncio]==2.0.23
 
 # Cryptography and security
-cryptography==41.0.8
+cryptography==41.0.7
 PyJWT==2.8.0
 bcrypt==4.1.2
 

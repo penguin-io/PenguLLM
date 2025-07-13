@@ -55,10 +55,6 @@ check_docker() {
         exit 1
     fi
 
-    if ! command -v docker-compose &> /dev/null; then
-        log_error "Docker Compose is not installed. Please install Docker Compose first."
-        exit 1
-    fi
 
     log_success "Docker and Docker Compose are available"
 }
@@ -208,10 +204,10 @@ start_system() {
     log_header "Starting PenguLLM System"
 
     log_info "Building Docker images..."
-    docker-compose -p "$PROJECT_NAME" build
+    docker compose -p "$PROJECT_NAME" build
 
     log_info "Starting services..."
-    docker-compose -p "$PROJECT_NAME" up -d
+    docker compose -p "$PROJECT_NAME" up -d
 
     log_info "Waiting for services to be ready..."
 
@@ -220,7 +216,7 @@ start_system() {
     local attempt=1
 
     while [ $attempt -le $max_attempts ]; do
-        if docker-compose -p "$PROJECT_NAME" exec -T postgres pg_isready -U zkp_user -d zkp_llm 2>/dev/null; then
+        if docker compose -p "$PROJECT_NAME" exec -T postgres pg_isready -U zkp_user -d zkp_llm 2>/dev/null; then
             log_success "Database is ready"
             break
         fi
@@ -238,7 +234,7 @@ start_system() {
     # Wait for Redis
     attempt=1
     while [ $attempt -le $max_attempts ]; do
-        if docker-compose -p "$PROJECT_NAME" exec -T redis redis-cli ping 2>/dev/null | grep -q PONG; then
+        if docker compose -p "$PROJECT_NAME" exec -T redis redis-cli ping 2>/dev/null | grep -q PONG; then
             log_success "Redis is ready"
             break
         fi
@@ -312,7 +308,7 @@ start_system() {
 show_status() {
     log_header "System Status"
 
-    docker-compose -p "$PROJECT_NAME" ps
+    docker compose -p "$PROJECT_NAME" ps
 
     echo
     log_header "Service Endpoints"
@@ -353,14 +349,14 @@ show_logs() {
     log_header "System Logs"
     echo "Press Ctrl+C to exit log viewing"
     echo
-    docker-compose -p "$PROJECT_NAME" logs -f
+    docker compose -p "$PROJECT_NAME" logs -f
 }
 
 # Stop the system
 stop_system() {
     log_header "Stopping PenguLLM System"
 
-    docker-compose -p "$PROJECT_NAME" down
+    docker compose -p "$PROJECT_NAME" down
     log_success "System stopped"
 }
 
@@ -371,7 +367,7 @@ cleanup_system() {
     read -p "This will remove all containers, volumes, and images. Continue? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        docker-compose -p "$PROJECT_NAME" down -v --rmi all
+        docker compose -p "$PROJECT_NAME" down -v --rmi all
         docker system prune -f
         log_success "Cleanup completed"
     else

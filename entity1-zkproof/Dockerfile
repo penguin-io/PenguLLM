@@ -1,7 +1,7 @@
 # Multi-stage build for ZK Proof Service (Entity 1)
 # Based on Ubuntu with CUDA support for GPU acceleration
 
-FROM nvidia/cuda:12.1-devel-ubuntu22.04 as builder
+FROM nvidia/cuda:12.9.1-devel-ubuntu22.04 as builder
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -21,24 +21,39 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 WORKDIR /app
 
 # Copy dependency files first for better layer caching
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.toml  ./
+#COPY Cargo.toml Cargo.lock ./
 COPY build.rs ./
 
+# Install rzup and risc0 toolchain
+RUN curl -L https://risczero.com/install | bash -s --
+ENV PATH="/root/.cargo/bin:${PATH}"
+ENV PATH="/root/.risc0/bin:${PATH}"
+RUN rzup install
+
 # Create a dummy main.rs to build dependencies
-RUN mkdir -p src && echo "fn main() {}" > src/main.rs && echo "fn main() {}" > src/guest.rs
-
-# Build dependencies (this layer will be cached unless Cargo.toml changes)
-RUN cargo build --release && rm -rf src
-
-# Copy the actual source code
-COPY src/ ./src/
-COPY migrations/ ./migrations/
-
-# Build the application
+#RUN mkdir -p src && echo "fn main() {}" > src/main.rs && echo "fn main() {}" > src/guest.rs
+#
+## Build dependencies (this layer will be cached unless Cargo.toml changes)
+#RUN cargo build --release && rm -rf src
+COPY guest/ ./guest/
+COPY . .
+#RUN cargo build --release
 RUN cargo build --release
 
+
+# Copy the actual source code
+#COPY src/ ./src/
+#COPY migrations/ ./migrations/
+
+# Build the application
+#RUN cargo build --release
+#RUN cargo build --release \
+#  --target riscv32im-risc0-zkvm-elf \
+#  -p risc0-zkvm
+
 # Runtime stage with CUDA runtime
-FROM nvidia/cuda:12.1-runtime-ubuntu22.04
+FROM nvidia/cuda:12.9.1-devel-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
@@ -59,7 +74,7 @@ COPY --from=builder /app/migrations /app/migrations
 
 # Copy configuration and scripts
 COPY docker/entrypoint.sh /app/entrypoint.sh
-COPY docker/healthcheck.sh /app/healthcheck.sh
+#COPY docker/healthcheck.sh /app/healthcheck.sh
 
 # Make scripts executable
 RUN chmod +x /app/entrypoint.sh /app/healthcheck.sh

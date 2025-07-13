@@ -7,9 +7,7 @@ edition = "2021"
 name = "server"
 path = "src/main.rs"
 
-[[bin]]
-name = "guest"
-path = "src/guest.rs"
+
 
 [dependencies]
 # Web framework and async runtime
@@ -25,7 +23,7 @@ serde_json = "1.0"
 uuid = { version = "1.6", features = ["v4"] }
 
 # Zero-knowledge proofs with RiscZero
-risc0-zkvm = { version = "1.1", features = ["cuda"] }
+#risc0-zkvm = { version = "1.1", features = ["cuda"] }
 risc0-zkp = "1.1"
 risc0-binfmt = "1.1"
 risc0-build = "1.1"
@@ -67,9 +65,9 @@ risc0-build = "1.1"
 tempfile = "3.8"
 criterion = { version = "0.5", features = ["html_reports"] }
 
-[[bench]]
-name = "zkproof_benchmarks"
-harness = false
+#[[bench]]
+#name = "zkproof_benchmarks"
+#harness = false
 
 [profile.release]
 opt-level = 3

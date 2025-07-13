@@ -57,8 +57,8 @@ RUN mkdir -p /app/logs /app/cache && \
     chown -R nextjs:nodejs /app/logs /app/cache
 
 # Copy health check script
-COPY docker/healthcheck.sh /app/healthcheck.sh
-RUN chmod +x /app/healthcheck.sh
+#COPY docker/healthcheck.sh /app/healthcheck.sh
+#RUN chmod +x /app/healthcheck.sh
 
 # Switch to non-root user
 USER nextjs

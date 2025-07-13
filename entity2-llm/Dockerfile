@@ -1,7 +1,7 @@
 # Multi-stage build for Entity 2 LLM Advisor Service
 # Based on NVIDIA PyTorch image with CUDA support for GPU acceleration
 
-FROM nvidia/cuda:12.1-devel-ubuntu22.04 as base
+FROM nvidia/cuda:12.9.1-devel-ubuntu22.04 as base
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     git \
+cuda-toolkit-12-1 \
     libssl-dev \
     libffi-dev \
     libbz2-dev \
@@ -65,10 +66,11 @@ COPY config/ /app/config/
 
 # Copy entrypoint and health check scripts
 COPY docker/entrypoint.sh /app/entrypoint.sh
-COPY docker/healthcheck.sh /app/healthcheck.sh
+#COPY docker/healthcheck.sh /app/healthcheck.sh
 
 # Make scripts executable
-RUN chmod +x /app/entrypoint.sh /app/healthcheck.sh
+RUN chmod +x /app/entrypoint.sh
+#RUN chmod +x /app/entrypoint.sh /app/healthcheck.sh
 
 # Create version file
 RUN echo "0.1.0" > /app/VERSION

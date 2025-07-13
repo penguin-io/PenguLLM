@@ -1,6 +1,7 @@
 //! Guest program for zero-knowledge proof generation
 //! Implements the Japanese Bankers Association risk assessment logic as described in the paper
 
+#![no_std]
 #![no_main]
 
 use risc0_zkvm::guest::env;

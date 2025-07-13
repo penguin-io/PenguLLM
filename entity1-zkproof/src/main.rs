@@ -4,6 +4,8 @@
 //! as described in the paper. It securely processes user data and generates
 //! cryptographic proofs of user traits without revealing the underlying data.
 
+#![no_std]
+#![no_main]
 use anyhow::{Context, Result};
 use axum::{
     extract::{Path, Query, State},
